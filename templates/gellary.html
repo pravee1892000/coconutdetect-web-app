@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #2c3e50;
+            padding: 15px 0;
+            color: white;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links li a:hover {
+            text-decoration: underline;
+        }
+
+        .gallery-section {
+            max-width: 1200px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .gallery-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .gallery-grid {
+            position: relative;
+            width: 600px; /* Fixed width for better centering */
+            height: 400px;
+            margin: 0 auto;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gallery-grid img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .gallery-grid img.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">Coconut Maturity Detection</div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/gellary">Gallery</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="gallery-section">
+            <h1>Our Business Gallery</h1>
+            <div class="gallery-grid" id="slideshow">
+                <img src="{{ url_for('static', filename='gellary/g1.jpeg') }}" alt="Image 1" class="active">
+                <img src="{{ url_for('static', filename='gellary/g2.jpeg') }}" alt="Image 2">
+                <img src="{{ url_for('static', filename='gellary/g3.jpeg') }}" alt="Image 3">
+                <img src="{{ url_for('static', filename='gellary/g4.jpeg') }}" alt="Image 4">
+                <img src="{{ url_for('static', filename='gellary/g5.jpeg') }}" alt="Image 5">
+                <img src="{{ url_for('static', filename='gellary/g6.jpeg') }}" alt="Image 6">
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Coconut Maturity Detection App | Designed and Developed By Praveen B S</p>
+    </footer>
+
+    <script>
+        const slides = document.querySelectorAll('#slideshow img');
+        let index = 0;
+
+        setInterval(() => {
+            slides[index].classList.remove('active');
+            index = (index + 1) % slides.length;
+            slides[index].classList.add('active');
+        }, 2000); // change every 2 seconds
+    </script>
+
+</body>
+</html>

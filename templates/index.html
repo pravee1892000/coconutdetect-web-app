@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coconut Maturity Detection App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Coconut Maturity Detection</div>
+            <ul class="nav-links">
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/gellary">Gallery</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section with Video Background -->
+        <section class="hero">
+            <video autoplay muted loop id="bg-video">
+                <source src="{{ url_for('static', filename='media/coconut_tree.mp4') }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="hero-overlay">
+                <h1>Real-time Coconut Maturity Detection</h1>
+                <p>Upload an image or video, or use your webcam for real-time detection using YOLO.</p>
+            </div>
+        </section>
+
+        <!-- Upload Section -->
+        <section class="upload-section">
+            <div class="upload-container">
+                <h2>Upload Image</h2>
+                <form action="/predict_img" method="POST" enctype="multipart/form-data">
+                    <div class="file-input">
+                        <input type="file" name="file" id="img-file" accept=".jpg">
+                        <label for="img-file">Choose a JPG file</label>
+                    </div>
+                    <button type="submit" class="btn">Detect Objects</button>
+                </form>
+            </div>
+
+            <div class="upload-container">
+                <h2>Upload Video</h2>
+                <form action="/predict_video" method="POST" enctype="multipart/form-data">
+                    <div class="file-input">
+                        <input type="file" name="file" id="video-file" accept=".mp4">
+                        <label for="video-file">Choose an MP4 file</label>
+                    </div>
+                    <button type="submit" class="btn">Detect Objects</button>
+                </form>
+            </div>
+
+            <div class="upload-container">
+                <h2>Use Webcam</h2>
+                <div class="webcam-options">
+                    <button id="start-webcam" class="btn">Start Webcam</button>
+                    <button id="stop-webcam" class="btn btn-secondary" disabled>Stop Webcam</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detection Results -->
+        <section class="results-section">
+            <h2>Detection Results</h2>
+            <div class="result-container">
+                {% if image_path %}
+                <div class="result-item">
+                    <h3>Image Detection Result</h3>
+                    <img src="{{ url_for('static', filename=image_path) }}" alt="Detection Result">
+                </div>
+                {% endif %}
+
+                {% if video_path %}
+                <div class="result-item">
+                    <h3>Video Detection Result</h3>
+                    <video controls width="100%">
+                        <source src="{{ url_for('static', filename=video_path) }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                {% endif %}
+
+                <div id="webcam-result" class="result-item" style="display: none;">
+                    <h3>Webcam Detection</h3>
+                    <img id="webcam-feed" alt="Webcam Feed">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Coconut Maturity Detection App | Designed and Developed By Praveen B S</p>
+    </footer>
+
+    <script>
+        const startWebcamBtn = document.getElementById('start-webcam');
+        const stopWebcamBtn = document.getElementById('stop-webcam');
+        const webcamResult = document.getElementById('webcam-result');
+        const webcamFeed = document.getElementById('webcam-feed');
+
+        startWebcamBtn.addEventListener('click', () => {
+            webcamResult.style.display = 'block';
+            webcamFeed.src = "{{ url_for('webcam_feed') }}";
+            startWebcamBtn.disabled = true;
+            stopWebcamBtn.disabled = false;
+        });
+
+        stopWebcamBtn.addEventListener('click', () => {
+            webcamResult.style.display = 'none';
+            webcamFeed.src = "";
+            startWebcamBtn.disabled = false;
+            stopWebcamBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>

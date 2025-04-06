@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Coconut Maturity Detection App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Coconut Maturity Detection</div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about" class="active">About</a></li>
+                <li><a href="/gellary">Gallery</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="about-section">
+            <h1>About App</h1>
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Why We Developed It</h2>
+                    <p>In our village, we are coconut fruit harvesters. Identifying the exact ripeness of coconuts for harvesting has always been a challenge. To address this issue, I took it upon myself to develop a robust detection system. This system will help young starters easily identify the ripeness of coconuts.</p>
+                    <h2>How It Works</h2>
+                    <p>Our application uses YOLO (You Only Look Once), a state-of-the-art real-time maturity  detection system. The app allows you to upload images or videos, or use your webcam to detect in real-time.</p>
+                    
+                    <h2>Technologies Used</h2>
+                    <ul>
+                        <li><strong>Backend:</strong> Flask (Python)</li>
+                        <li><strong>Object Detection:</strong> Machine Learning, Ultralytics YOLO</li>
+                        <li><strong>Image Processing:</strong> OpenCV, PIL</li>
+                        <li><strong>Frontend:</strong> HTML, CSS, JavaScript</li>
+                    </ul>
+                    
+                    <h2>Features</h2>
+                    <ul>
+                        <li>Image coconut maturity detection</li>
+                        <li>Video coconut maturity detection</li>
+                        <li>Real-time webcam coconut maturity detection</li>
+                        <li>Support for three classes</li>
+                    </ul>
+                </div>
+                <div class="about-image">
+                    <img src="{{ url_for('static', filename='coconut (9).jpg') }}" alt="Object Detection Illustration">
+                    <p class="caption">Detection in a scene</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Coconut Maturity Detection App | Designed and Developed By Praveen B S</p>
+    </footer>
+</body>
+</html>
