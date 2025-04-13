@@ -2,11 +2,12 @@ import io
 from PIL import Image
 import cv2
 from flask import Flask, render_template, request, Response
-import os
-import time
+import numpy as np
 from ultralytics import YOLO
 
-app=Flask(__name__,static_folder='static')
+app = Flask(__name__)
+
+model = YOLO('best1.pt')  # Load model once at the start
 
 @app.route("/")
 def index():
@@ -28,76 +29,53 @@ def contact():
 def predict_img():
     if 'file' in request.files:
         f = request.files['file']
-        basepath = os.path.dirname(__file__)
-        filepath = os.path.join(basepath, 'uploads', f.filename)
-        f.save(filepath)
-        print(filepath)
+        in_memory_file = io.BytesIO()
+        f.save(in_memory_file)
+        in_memory_file.seek(0)
 
-        file_extension = f.filename.rsplit('.', 1)[1].lower()
+        img = Image.open(in_memory_file).convert('RGB')  # Ensure RGB format
+        results = model(img)
+        res_plotted = results[0].plot()
 
-        if file_extension == 'jpg':
-            img = cv2.imread(filepath)
-            frame = cv2.imencode('.jpg', img)[1].tobytes()
+        # Directly encode to JPEG without color conversion
+        _, img_encoded = cv2.imencode('.jpg', res_plotted)
+        response = img_encoded.tobytes()
 
-            image = Image.open(io.BytesIO(frame))
+        return Response(response, mimetype='image/jpeg')
 
-            # Perform object detection
-            yolo = YOLO('best1.pt')
-            results = yolo(image, save=True)
-            res_plotted = results[0].plot()
-            output_path = os.path.join('static', f.filename)
-            cv2.imwrite(output_path, res_plotted)
-            return render_template('index.html', image_path=f.filename)
+    return "No image uploaded or unsupported format."
 
-    return "File format not supported or file not uploaded properly."
-
-# Route to handle video upload and real-time detection
 @app.route("/predict_video", methods=["POST"])
 def predict_video():
     if 'file' in request.files:
         f = request.files['file']
-        basepath = os.path.dirname(__file__)
-        filepath = os.path.join(basepath, 'uploads', f.filename)
-        f.save(filepath)
+        in_memory_file = io.BytesIO()
+        f.save(in_memory_file)
+        in_memory_file.seek(0)
 
-        file_extension = f.filename.rsplit('.', 1)[1].lower()
+        video_array = np.asarray(bytearray(in_memory_file.read()), dtype=np.uint8)
+        cap = cv2.VideoCapture(cv2.CAP_FFMPEG)
+        cap.open(io.BytesIO(video_array))
 
-        if file_extension == 'mp4':
-            video_path = filepath
-            cap = cv2.VideoCapture(video_path)
-            frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-            frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            fourcc = cv2.VideoWriter_fourcc(*'avc1')
-            output_path = os.path.join('static', f.filename)
-            out = cv2.VideoWriter(output_path, fourcc, 30.0, (frame_width, frame_height))
-            yolo = YOLO('best1.pt')
-            frames = [] 
-            i=0
+        def generate_frames():
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
                     break
-                i=i+1
-                if i<10:
-                    continue
-                i=0
-                results = yolo(frame, save=False)
+                results = model(frame)
                 res_plotted = results[0].plot()
 
-                # Append processed frame to list
-                frames.append(res_plotted)
+                # No color conversion
+                _, buffer = cv2.imencode('.jpg', res_plotted)
+                frame = buffer.tobytes()
 
-                if cv2.waitKey(1) == ord('q'):
-                    break
-
-            # Write all frames to output video
-            for frame in frames:
-                out.write(frame)
-
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
             cap.release()
-            out.release()
-            cv2.destroyAllWindows()
-            return render_template('index.html', video_path=f.filename)
+
+        return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+    return "No video uploaded or unsupported format."
 
 @app.route("/webcam_feed")
 def webcam_feed():
@@ -105,36 +83,16 @@ def webcam_feed():
 
     def generate():
         while True:
-            success, frame = cap.read()
-            if not success:
+            ret, frame = cap.read()
+            if not ret:
                 break
-            ret, buffer = cv2.imencode('.jpg', frame) 
-            frame = buffer.tobytes()
-            print(type(frame))
-            
-            img = Image.open(io.BytesIO(frame))
- 
-            
-            model = YOLO('best1.pt')
-            results = model(img, save=True)              
 
-            print(results)
-            cv2.waitKey(1)
-
+            results = model(frame)
             res_plotted = results[0].plot()
-            cv2.imshow("result", res_plotted)
 
-
-            if cv2.waitKey(1) == ord('q'):
-                break
-
-            # read image as BGR
-            img_BGR = cv2.cvtColor(res_plotted, cv2.COLOR_RGB2BGR) 
-            
-            # Encode BGR image to bytes so that cv2 will convert to RGB
-            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-            #print(frame)
-                
+            # No color conversion
+            _, buffer = cv2.imencode('.jpg', res_plotted)
+            frame = buffer.tobytes()
 
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
