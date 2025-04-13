@@ -13,7 +13,7 @@
             <ul class="nav-links">
                 <li><a href="/" class="active">Home</a></li>
                 <li><a href="/about">About</a></li>
-                <li><a href="/gellary">Gallery</a></li>
+                <li><a href="/gallery">Gallery</a></li>
                 <li><a href="/contact">Contact</a></li>
             </ul>
         </nav>
@@ -38,8 +38,8 @@
                 <h2>Upload Image</h2>
                 <form action="/predict_img" method="POST" enctype="multipart/form-data">
                     <div class="file-input">
-                        <input type="file" name="file" id="img-file" accept=".jpg">
-                        <label for="img-file">Choose a JPG file</label>
+                        <input type="file" name="file" id="img-file" accept="image/*">
+                        <label for="img-file">Choose an image file</label>
                     </div>
                     <button type="submit" class="btn">Detect Objects</button>
                 </form>
@@ -49,8 +49,8 @@
                 <h2>Upload Video</h2>
                 <form action="/predict_video" method="POST" enctype="multipart/form-data">
                     <div class="file-input">
-                        <input type="file" name="file" id="video-file" accept=".mp4">
-                        <label for="video-file">Choose an MP4 file</label>
+                        <input type="file" name="file" id="video-file" accept="video/*">
+                        <label for="video-file">Choose a video file</label>
                     </div>
                     <button type="submit" class="btn">Detect Objects</button>
                 </form>
@@ -69,27 +69,7 @@
         <section class="results-section">
             <h2>Detection Results</h2>
             <div class="result-container">
-                {% if image_path %}
-                <div class="result-item">
-                    <h3>Image Detection Result</h3>
-                    <img src="{{ url_for('static', filename=image_path) }}" alt="Detection Result">
-                </div>
-                {% endif %}
-
-                {% if video_path %}
-                <div class="result-item">
-                    <h3>Video Detection Result</h3>
-                    <video controls width="100%">
-                        <source src="{{ url_for('static', filename=video_path) }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                {% endif %}
-
-                <div id="webcam-result" class="result-item" style="display: none;">
-                    <h3>Webcam Detection</h3>
-                    <img id="webcam-feed" alt="Webcam Feed">
-                </div>
+                <div id="detection-results"></div>
             </div>
         </section>
     </main>
@@ -99,23 +79,79 @@
     </footer>
 
     <script>
+        // Form submission handler for image
+        document.querySelector('form[action="/predict_img"]').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('/predict_img', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const imageUrl = URL.createObjectURL(blob);
+                const detectionResults = document.getElementById('detection-results');
+                detectionResults.innerHTML = `
+                    <div class="result-item">
+                        <h3>Image Detection Result</h3>
+                        <img src="${imageUrl}" alt="Detection Result" class="result-img">
+                    </div>
+                `;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Form submission handler for video
+    document.querySelector('form[action="/predict_video"]').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        fetch('/predict_video', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const videoUrl = URL.createObjectURL(blob);
+            const detectionResults = document.getElementById('detection-results');
+            detectionResults.innerHTML = `
+                <div class="result-item">
+                    <h3>Video Detection Result</h3>
+                    <video controls class="result-video">
+                        <source src="${videoUrl}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            `;
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+        // Webcam controls
         const startWebcamBtn = document.getElementById('start-webcam');
         const stopWebcamBtn = document.getElementById('stop-webcam');
-        const webcamResult = document.getElementById('webcam-result');
-        const webcamFeed = document.getElementById('webcam-feed');
 
         startWebcamBtn.addEventListener('click', () => {
-            webcamResult.style.display = 'block';
-            webcamFeed.src = "{{ url_for('webcam_feed') }}";
             startWebcamBtn.disabled = true;
             stopWebcamBtn.disabled = false;
+            
+            // Show in results section
+            const detectionResults = document.getElementById('detection-results');
+            detectionResults.innerHTML = `
+                <div class="result-item">
+                    <h3>Webcam Detection</h3>
+                    <img src="/webcam_feed" alt="Webcam Detection Feed" class="result-img">
+                </div>
+            `;
         });
 
         stopWebcamBtn.addEventListener('click', () => {
-            webcamResult.style.display = 'none';
-            webcamFeed.src = "";
             startWebcamBtn.disabled = false;
             stopWebcamBtn.disabled = true;
+            
+            // Clear results section
+            document.getElementById('detection-results').innerHTML = '';
         });
     </script>
 </body>
