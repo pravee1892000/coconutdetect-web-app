@@ -35,7 +35,6 @@ This repository contains a Flask-based web application developed to detect the m
 | Layer           | Technologies                             |
 |------------------|------------------------------------------|
 | **Frontend**     | HTML5, CSS3, JavaScript                   |
-|
 | **Backend**      | Python, Flask                            |
 | **ML/DL Models** | YOLOv8 (Instance Segmentation), OpenCV   |
 | **Deployment**   | Local Server (Flask),Render website: https://coconutdetect-web-app.onrender.com/                 |
