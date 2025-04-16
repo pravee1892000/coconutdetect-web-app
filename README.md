@@ -1,4 +1,4 @@
-# 🥥 Coconut Maturity Detection using ML Approaches (Flask)
+# 🥥 Coconut Maturity Detection and Family Business Website
 
 ## 🌟 Overview
 
@@ -23,7 +23,7 @@ This repository contains a Flask-based web application developed to detect the m
 - Details about our family's background, expertise, and journey in the coconut farming business.
 
 ### 🖼️ Gallery
-- A curated visual showcase of coconut samples at various maturity stages and our farming process.
+- A curated visual showcase of our Business.
 
 ### ☎️ Contact Page
 - Reach out to us for queries, feedback, or potential collaborations.
@@ -42,9 +42,3 @@ This repository contains a Flask-based web application developed to detect the m
 
 ---
 
-## 📦 Installation
-
-1. **Clone the Repository**  
-   ```bash
-   git clone https://github.com/pravee1892000/Coconut-Maturity-Detection-using-ML-approaches-flask.git
-   cd Coconut-Maturity-Detection-using-ML-approaches-flask
