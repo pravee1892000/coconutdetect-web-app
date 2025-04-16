@@ -34,7 +34,7 @@ This repository contains a Flask-based web application developed to detect the m
 
 | Layer           | Technologies                             |
 |------------------|------------------------------------------|
-| **Frontend**     | HTML5, CSS3, JavaScript
+| **Frontend**     | HTML5, CSS3, JavaScript                   |
 |
 | **Backend**      | Python, Flask                            |
 | **ML/DL Models** | YOLOv8 (Instance Segmentation), OpenCV   |
